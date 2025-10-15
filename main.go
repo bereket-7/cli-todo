@@ -9,9 +9,12 @@ import (
 
 // Todo represents a single task
 type Todo struct {
-	Task string
-	Done bool
+    Task     string `json:"task"`
+    Done     bool   `json:"done"`
+    Category string `json:"category"`
+    Deadline string `json:"deadline"` // format: YYYY-MM-DD
 }
+
 
 // File to store todos
 const todoFile = "todos.json"
