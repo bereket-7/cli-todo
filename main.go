@@ -9,9 +9,12 @@ import (
 
 // Todo represents a single task
 type Todo struct {
-	Task string
-	Done bool
+    Task     string `json:"task"`
+    Done     bool   `json:"done"`
+    Category string `json:"category"`
+    Deadline string `json:"deadline"` // format: YYYY-MM-DD
 }
+
 
 // File to store todos
 const todoFile = "todos.json"
@@ -41,20 +44,26 @@ func SaveTodos(todos []Todo) error {
 	}
 	return os.WriteFile(todoFile, data, 0644)
 }
-
-// Helper to print todos
 func ListTodos(todos []Todo) {
-	if len(todos) == 0 {
-		fmt.Println("No todos yet!")
-		return
-	}
-	for i, t := range todos {
-		status := "[ ]"
-		if t.Done {
-			status = "[x]"
-		}
-		fmt.Printf("%d. %s %s\n", i+1, status, t.Task)
-	}
+    if len(todos) == 0 {
+        fmt.Println("No todos yet!")
+        return
+    }
+    for i, t := range todos {
+        status := "[ ]"
+        if t.Done {
+            status = "[x]"
+        }
+        cat := ""
+        if t.Category != "" {
+            cat = fmt.Sprintf(" (%s)", t.Category)
+        }
+        dl := ""
+        if t.Deadline != "" {
+            dl = fmt.Sprintf(" - due %s", t.Deadline)
+        }
+        fmt.Printf("%d. %s %s%s%s\n", i+1, status, t.Task, cat, dl)
+    }
 }
 
 func main() {
@@ -69,7 +78,6 @@ func main() {
 		fmt.Println("Error loading todos:", err)
 		return
 	}
-
 	switch command {
 	case "add":
 		if len(os.Args) < 3 {
@@ -77,13 +85,38 @@ func main() {
 			return
 		}
 		task := os.Args[2]
-		todos = append(todos, Todo{Task: task})
+		category := ""
+		deadline := ""
+	
+		if len(os.Args) >= 4 {
+			category = os.Args[3]
+		}
+		if len(os.Args) >= 5 {
+			deadline = os.Args[4]
+		}
+	
+		// Remove existing duplicates of this exact task (task + category + deadline)
+		for _, t := range todos {
+			if t.Task == task && t.Category == category && t.Deadline == deadline {
+				fmt.Println("Task already exists:", task)
+				return
+			}
+		}
+	
+		// Append new todo and save
+		todos = append(todos, Todo{
+			Task:     task,
+			Category: category,
+			Deadline: deadline,
+		})
+	
 		if err := SaveTodos(todos); err != nil {
 			fmt.Println("Error saving todos:", err)
 			return
 		}
+	
 		fmt.Println("Added:", task)
-
+	
 	case "list":
 		ListTodos(todos)
 

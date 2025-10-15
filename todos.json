@@ -1,6 +1,14 @@
 [
   {
-    "Task": "Buy eggs",
-    "Done": false
+    "task": "Buy milk",
+    "done": false,
+    "category": "Groceries",
+    "deadline": "2025-10-20"
+  },
+  {
+    "task": "Write report",
+    "done": false,
+    "category": "Work",
+    "deadline": "2025-10-25"
   }
 ]
