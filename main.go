@@ -80,12 +80,28 @@ func main() {
 			return
 		}
 		task := os.Args[2]
-		todos = append(todos, Todo{Task: task})
+		category := ""
+		deadline := ""
+	
+		if len(os.Args) >= 4 {
+			category = os.Args[3]
+		}
+		if len(os.Args) >= 5 {
+			deadline = os.Args[4] 
+		}
+	
+		todos = append(todos, Todo{
+			Task:     task,
+			Category: category,
+			Deadline: deadline,
+		})
+	
 		if err := SaveTodos(todos); err != nil {
 			fmt.Println("Error saving todos:", err)
 			return
 		}
 		fmt.Println("Added:", task)
+	
 
 	case "list":
 		ListTodos(todos)
