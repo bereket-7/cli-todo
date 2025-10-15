@@ -5,7 +5,32 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+
+	"github.com/fatih/color"
 )
+
+var (
+    green = color.New(color.FgGreen).SprintFunc()
+    red   = color.New(color.FgRed).SprintFunc()
+)
+
+func ListTodos(todos []Todo) {
+    if len(todos) == 0 {
+        fmt.Println("No todos yet!")
+        return
+    }
+    for i, t := range todos {
+        status := "[ ]"
+        if t.Done {
+            status = green("[x]")
+        }
+        line := fmt.Sprintf("%d. %s %s", i+1, status, t.Task)
+        if t.Deadline != "" {
+            line += fmt.Sprintf(" - due %s", t.Deadline)
+        }
+        fmt.Println(line)
+    }
+}
 
 // Todo represents a single task
 type Todo struct {
@@ -44,27 +69,27 @@ func SaveTodos(todos []Todo) error {
 	}
 	return os.WriteFile(todoFile, data, 0644)
 }
-func ListTodos(todos []Todo) {
-    if len(todos) == 0 {
-        fmt.Println("No todos yet!")
-        return
-    }
-    for i, t := range todos {
-        status := "[ ]"
-        if t.Done {
-            status = "[x]"
-        }
-        cat := ""
-        if t.Category != "" {
-            cat = fmt.Sprintf(" (%s)", t.Category)
-        }
-        dl := ""
-        if t.Deadline != "" {
-            dl = fmt.Sprintf(" - due %s", t.Deadline)
-        }
-        fmt.Printf("%d. %s %s%s%s\n", i+1, status, t.Task, cat, dl)
-    }
-}
+// func ListTodos(todos []Todo) {
+//     if len(todos) == 0 {
+//         fmt.Println("No todos yet!")
+//         return
+//     }
+//     for i, t := range todos {
+//         status := "[ ]"
+//         if t.Done {
+//             status = "[x]"
+//         }
+//         cat := ""
+//         if t.Category != "" {
+//             cat = fmt.Sprintf(" (%s)", t.Category)
+//         }
+//         dl := ""
+//         if t.Deadline != "" {
+//             dl = fmt.Sprintf(" - due %s", t.Deadline)
+//         }
+//         fmt.Printf("%d. %s %s%s%s\n", i+1, status, t.Task, cat, dl)
+//     }
+// }
 
 func main() {
 	if len(os.Args) < 2 {
@@ -154,6 +179,39 @@ func main() {
 			return
 		}
 		fmt.Println("Deleted:", deleted)
+
+	case "edit":
+		if len(os.Args) < 3 {
+			fmt.Println("Usage: todo edit <task number> [new task] [category] [deadline]")
+			return
+		}
+	
+		index, err := strconv.Atoi(os.Args[2])
+		if err != nil || index < 1 || index > len(todos) {
+			fmt.Println("Invalid task number.")
+			return
+		}
+	
+		task := todos[index-1]
+	
+		if len(os.Args) >= 4 {
+			task.Task = os.Args[3]
+		}
+		if len(os.Args) >= 5 {
+			task.Category = os.Args[4]
+		}
+		if len(os.Args) >= 6 {
+			task.Deadline = os.Args[5]
+		}
+	
+		todos[index-1] = task
+		if err := SaveTodos(todos); err != nil {
+			fmt.Println("Error saving todos:", err)
+			return
+		}
+	
+		fmt.Println("Edited task:", task.Task)
+	
 
 	default:
 		fmt.Println("Unknown command:", command)
