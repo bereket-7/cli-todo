@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/fatih/color"
 )
@@ -31,6 +32,11 @@ func ListTodos(todos []Todo) {
         fmt.Println(line)
     }
 }
+
+func containsIgnoreCase(s, substr string) bool {
+    return strings.Contains(strings.ToLower(s), strings.ToLower(substr))
+}
+
 
 // Todo represents a single task
 type Todo struct {
@@ -211,6 +217,27 @@ func main() {
 		}
 	
 		fmt.Println("Edited task:", task.Task)
+
+	case "search":
+		if len(os.Args) < 3 {
+			fmt.Println("Usage: todo search <keyword>")
+			return
+		}
+	
+		keyword := os.Args[2]
+		found := false
+	
+		for i, t := range todos {
+			if containsIgnoreCase(t.Task, keyword) || containsIgnoreCase(t.Category, keyword) || containsIgnoreCase(t.Deadline, keyword) {
+				fmt.Printf("%d. [%v] %s (%s) - due %s\n", i+1, t.Done, t.Task, t.Category, t.Deadline)
+				found = true
+			}
+		}
+	
+		if !found {
+			fmt.Println("No matching tasks found for:", keyword)
+		}
+	
 	
 
 	default:
