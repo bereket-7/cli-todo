@@ -238,6 +238,31 @@ func main() {
 			fmt.Println("No matching tasks found for:", keyword)
 		}
 	
+	case "filter":
+		if len(os.Args) < 3 {
+			fmt.Println("Usage: todo filter <category|done|pending>")
+			return
+		}
+	
+		filter := strings.ToLower(os.Args[2])
+		found := false
+	
+		for i, t := range todos {
+			if filter == "done" && t.Done {
+				fmt.Printf("%d. [x] %s (%s) - due %s\n", i+1, t.Task, t.Category, t.Deadline)
+				found = true
+			} else if filter == "pending" && !t.Done {
+				fmt.Printf("%d. [ ] %s (%s) - due %s\n", i+1, t.Task, t.Category, t.Deadline)
+				found = true
+			} else if strings.ToLower(t.Category) == filter {
+				fmt.Printf("%d. [%v] %s (%s) - due %s\n", i+1, t.Done, t.Task, t.Category, t.Deadline)
+				found = true
+			}
+		}
+	
+		if !found {
+			fmt.Println("No tasks found for filter:", filter)
+		}
 	
 
 	default:
