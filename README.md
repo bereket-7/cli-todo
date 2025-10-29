@@ -24,19 +24,29 @@ go run main.go [command] [args]
 ```
 
 ## Commands
-- `add <task>`: Add a new task
-- `list`: Show all tasks
+- `add <task> [category] [deadline]`: Add a new task
+  - `deadline` format: `YYYY-MM-DD`
+  - Duplicate prevention: if a todo with the same `task`, `category`, and `deadline` exists, it won't be added
+- `list`: Show all tasks (displays status, optional category, and optional deadline)
 - `done <number>`: Mark the numbered task as done
 - `delete <number>`: Delete the numbered task
 
-Examples:
+## Examples
 ```bash
-# add tasks
+# add tasks (just a task)
 ./todo.exe add "Buy milk"
-./todo.exe add "Write report"
 
-# list tasks
+# add with category
+./todo.exe add "Write report" Work
+
+# add with category and deadline
+./todo.exe add "Submit taxes" Finance 2025-04-15
+
+# list tasks (example output)
 ./todo.exe list
+# 1. [ ] Buy milk
+# 2. [ ] Write report (Work)
+# 3. [ ] Submit taxes (Finance) - due 2025-04-15
 
 # mark task 1 as done
 ./todo.exe done 1
@@ -50,6 +60,7 @@ Examples:
 - If the file does not exist, it will be created on first save.
 
 ## Notes
-- Usage help (when no command is provided):
+- Usage help shown when no command is provided currently prints:
   - `Usage: go run main.go [add|list|done|delete] [task]`
+- The `add` command also accepts optional `category` and `deadline` (as documented above).
 - The `done` and `delete` commands take the task number as shown in `list`.
